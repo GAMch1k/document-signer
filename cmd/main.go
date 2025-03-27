@@ -11,30 +11,41 @@ import (
 
 var (
 	signFile string
+	signFilePub string
 )
 
 func init() {
 	hdir, _ := os.UserHomeDir();
 	signFile = path.Join(
-		hdir, ".ssh", "ds_sign.pub",
+		hdir, ".ssh", "ds_sign",
 	);
 	signFile = strings.ReplaceAll(signFile, "\\", "/");
+	signFilePub = signFile + ".pub";
 }
 
 func errHandler(err error) {
 	if err != nil { panic(err) }
 }
 
+func runCommand(c string, a ...string) string {
+	cmd := exec.Command( fmt.Sprintf( c, a ) );
+	
+	stdout, err := cmd.Output();
+	errHandler(err)
+	return string(stdout);
+}
+
 
 func generateSSH() {
-	ext := path.Ext(signFile);
-	fmt.Println(signFile, "\t\t->\t\t", ext);
+	// ext := path.Ext(signFile);
+	// fmt.Println(signFile, "\t\t->\t\t", ext);
 
 	if _, err := os.Stat(signFile); errors.Is(err, os.ErrNotExist) {
-		fmt.Println("Creating new ssh file")
+		fmt.Println("Creating new ssh-key file");
+
+		fmt.Println(runCommand("ssh-keygen -f \"%s\" -N \"''\"", signFile));
 	}
-
-
+	fmt.Println("File is created or already exist");
 }
 
 
