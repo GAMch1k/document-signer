@@ -1,11 +1,25 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
-	"errors"
+	"path"
+	"strings"
 )
+
+var (
+	signFile string
+)
+
+func init() {
+	hdir, _ := os.UserHomeDir();
+	signFile = path.Join(
+		hdir, ".ssh", "ds_sign.pub",
+	);
+	signFile = strings.ReplaceAll(signFile, "\\", "/");
+}
 
 func errHandler(err error) {
 	if err != nil { panic(err) }
@@ -13,8 +27,14 @@ func errHandler(err error) {
 
 
 func generateSSH() {
-	folder := "./keys";
-	fmt.Print(folder);
+	ext := path.Ext(signFile);
+	fmt.Println(signFile, "\t\t->\t\t", ext);
+
+	if _, err := os.Stat(signFile); errors.Is(err, os.ErrNotExist) {
+		fmt.Println("Creating new ssh file")
+	}
+
+
 }
 
 
